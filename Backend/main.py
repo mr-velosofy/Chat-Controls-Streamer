@@ -58,6 +58,13 @@ async def websocket_endpoint(ws: WebSocket):
                 "last_seen": datetime.now(),
             }
             await users_col.insert_one(user_doc)
+        # elif no uuid is there but user is then give them one and add the keybinds
+        elif "uuid" not in user:
+            user_uuid = str(uuid4())
+            await users_col.update_one(
+                {"access_token": access_token},
+                {"$set": {"uuid": user_uuid, "keys": keys}}
+            )
         else:
             user_uuid = user["uuid"]
             # upsert keys & last_seen on every login/connect

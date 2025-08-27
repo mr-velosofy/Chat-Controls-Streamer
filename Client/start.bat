@@ -19,7 +19,7 @@ python --version >nul 2>&1
 if %errorlevel% neq 0 (
     color 0C
     echo [!] Python not found. Installing latest version...
-    powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.12.5/python-3.12.5-amd64.exe -OutFile python_installer.exe"
+    powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.13.7/python-3.13.7-amd64.exe -OutFile python_installer.exe"
     echo [*] Installing Python 3.12.5 silently...
     start /wait python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
     del python_installer.exe

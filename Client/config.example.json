@@ -1,0 +1,14 @@
+{
+  "base_url": "BASE_URL_HERE",
+  "access_token": "YOUR_ACCESS_TOKEN_HERE",
+  "keys": [
+    { "action_name": "jump", "keybind": "space", "duration": 0 },
+    { "action_name": "dropgun", "keybind": "g", "duration": 0 },
+    { "action_name": "forward", "keybind": "w", "duration": 5 },
+    { "action_name": "backward", "keybind": "s", "duration": 5 },
+    { "action_name": "left", "keybind": "a", "duration": 5 },
+    { "action_name": "right", "keybind": "d", "duration": 5 },
+    { "action_name": "mb4", "keybind": "mb4", "duration": 0 },
+    { "action_name": "mb5", "keybind": "mb5", "duration": 0 }
+  ]
+}

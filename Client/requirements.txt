@@ -1,0 +1,7 @@
+websocket-client
+keyboard==0.13.5
+requests
+fastapi
+uvicorn[standard]
+motor
+pydantic

@@ -40,10 +40,16 @@ def log_error(msg):
     console.print(f"[bold red][ERROR][/bold red] {msg}")
 
 def log_ws(msg):      
-    console.print(f"[bold blue][WS][/bold blue] {msg}")
+    console.print(f"[bold cornflower_blue][WS][/bold cornflower_blue] {msg}")
 
 def log_action(msg):  
-    console.print(f"[bold green][ACTION][/bold green] {msg}")
+    console.print(
+                Panel.fit(
+                    f"[bold cornflower_blue][ACTION][/bold cornflower_blue] {msg}",
+                    box=box.ROUNDED,
+                    style="cornflower_blue"
+                )
+    )
 
 CONFIG_PATH = "config.json"
 
@@ -71,6 +77,7 @@ def ws_on_message(ws, message):
         return
 
     action = data.get("action")
+    user_name = data.get("user_name")
     if not action:
         log_ws("No action in payload")
         return
@@ -84,22 +91,26 @@ def ws_on_message(ws, message):
 
     t = threading.Thread(
         target=perform_action,
-        args=(keybind, duration, action.get("action_name")),
+        args=(keybind, duration, action.get("action_name"), user_name),
         daemon=True
     )
     t.start()
 
-def perform_action(keybind: str, duration: float, action_name: str = None):
-    label = f"{action_name or keybind}"
+def perform_action(keybind: str, duration: float, action_name: str = None, user_name: str = None):
+
+    label = f"{action_name + " (" + keybind.upper() + ")"}"
+    #  if user_name then add <user_name>
+    if user_name:
+        label = f"{user_name} - {label}"
     try:
         # Special case: mouse buttons
         if keybind == "mb4":
             click_xbutton(XBUTTON1)
-            log_action(f"{label} → Clicked Mouse Button 4 ")
+            log_action(f"{label} → Mb4 Clicked once")
             return
         elif keybind == "mb5":
             click_xbutton(XBUTTON2)
-            log_action(f"{label} → Clicked Mouse Button 5 ")
+            log_action(f"{label} → Mb5 Clicked once")
             return
 
         # Normal keyboard presses
@@ -197,7 +208,7 @@ def main():
     base_url = cfg.get("base_url").rstrip("/")
     ws_url = base_url.replace("http", "ws") + "/ws"
 
-    console.print(Panel.fit(f"[cyan]Base URL:[/cyan] {base_url}", box=box.ROUNDED, style="blue"))
+    console.print(Panel.fit(f"[cyan]Base URL:[/cyan] {base_url}", box=box.ROUNDED, style="cornflower_blue"))
 
     uuid = login_and_get_uuid(base_url, cfg["access_token"])
     if uuid:

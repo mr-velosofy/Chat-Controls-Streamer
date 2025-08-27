@@ -106,7 +106,15 @@ async def websocket_endpoint(ws: WebSocket):
 
 @app.get("/endpoint/{uuid}/{action_name}")
 async def trigger_action(uuid: str, action_name: str, request: Request):
-
+    user_name = None
+    try:
+        user = request.headers.get("Nightbot-User")
+        # user is a str in FastAPI so use split to find displayName
+        user_name = user.split("displayName=")[1].split("&")[0]
+        print(f"Action triggered by Nightbot user: {user_name}")
+    except:
+        pass # ignore if header not present or malformed
+    
     await asyncio.sleep(2)  # small delay to simulate processing
     # Find user and keys from DB
     user = await users_col.find_one({"uuid": uuid})
@@ -124,7 +132,7 @@ async def trigger_action(uuid: str, action_name: str, request: Request):
         return JSONResponse({"error": "client not connected"}, status_code=400)
 
     try:
-        await ws.send_text(json.dumps({"action": action}))
+        await ws.send_text(json.dumps({"action": action, "user_name": user_name}))
         return {"status": "sent", "uuid": uuid, "action": action}
     except Exception as e:
         return JSONResponse({"error": "failed to deliver", "detail": str(e)}, status_code=500)

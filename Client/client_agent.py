@@ -141,7 +141,13 @@ def main():
         sys.exit(1)
 
     cfg = load_config()
-    base_url = cfg.get("base_url", "http://localhost:8000").rstrip("/")
+
+    # if base_url and access_token are not present
+    if not cfg.get("base_url") or not cfg.get("access_token"):
+        log_error("Missing base_url or access_token in config.json.")
+        sys.exit(1)
+        
+    base_url = cfg.get("base_url").rstrip("/")
     ws_url = base_url.replace("http", "ws") + "/ws"
 
     log_info(f"Base: {base_url}")

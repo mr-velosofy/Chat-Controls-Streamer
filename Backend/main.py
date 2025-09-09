@@ -127,18 +127,18 @@ async def trigger_action(uuid: str, action_name: str, request: Request):
     keys = user.get("keys", []) or []
     action = next((k for k in keys if k.get("action_name").lower() == action_name.lower()), None)
     if not action:
-        return JSONResponse({"error": "action not available"}, status_code=400)
+        return JSONResponse({f"error": "action not available", "response": f"Action {action_name} not available"})
 
     # If client is connected, send action via websocket
     ws = connections.get(uuid)
     if not ws:
-        return JSONResponse({"error": "client not connected"}, status_code=400)
+        return JSONResponse({"error": "client not connected", "response": "Client not connected"})
 
     try:
         await ws.send_text(json.dumps({"action": action, "user_name": user_name}))
-        return {"status": "sent", "uuid": uuid, "action": action}
+        return {f"status": "sent", "uuid": uuid, "action": action, "response": f"{action_name} action delivered successfully"}
     except Exception as e:
-        return JSONResponse({"error": "failed to deliver", "detail": str(e)}, status_code=500)
+        return JSONResponse({"error": "failed to deliver", "detail": str(e), "response": f"Failed to deliver {action_name} action"})
 
 @app.get("/whoami/{access_token}")
 async def whoami(access_token: str):

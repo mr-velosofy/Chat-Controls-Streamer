@@ -16,6 +16,9 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "remote_keypress")
 
+print("Connecting to MongoDB at", MONGO_URI) #for debug
+
+
 mongo = AsyncIOMotorClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=False)
 db = mongo[DB_NAME]
 users_col = db["users"]

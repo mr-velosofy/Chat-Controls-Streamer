@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     db = mongo[DB_NAME]
     users_col = db["users"]
 
-    yield  # ASGI signals "lifespan.startup.complete" here
+    yield  # ASGI signals "lifespan.startup.complete" here !!
 
     mongo.close()
     print("🛑 MongoDB connection closed")

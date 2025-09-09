@@ -10,6 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from uuid import uuid4
 from datetime import datetime
 from dotenv import load_dotenv
+import certifi
 
 load_dotenv()
 
@@ -19,13 +20,30 @@ DB_NAME = os.getenv("DB_NAME", "remote_keypress")
 print("Connecting to MongoDB at", MONGO_URI) #for debug
 
 
-mongo = AsyncIOMotorClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=False)
+mongo = AsyncIOMotorClient(
+    MONGO_URI,
+    tls=True,
+    tlsCAFile=certifi.where()
+)
+
 db = mongo[DB_NAME]
 users_col = db["users"]
 
 app = FastAPI(title="Remote Keypress Backend (token->uuid, keys saved on each login)")
 
 # In-memory map of uuid -> websocket (live connections)
+
+# try initial connection to DB
+try:
+    db = mongo[DB_NAME]
+    users_col = db["users"]
+    # simple command to verify connection
+    mongo.admin.command('ping')
+    print("Connected to MongoDB")
+except Exception as e:
+    print(f"Failed to connect to DB: {e}")
+    
+    
 connections: Dict[str, WebSocket] = {}
 
 class WSInit(BaseModel):

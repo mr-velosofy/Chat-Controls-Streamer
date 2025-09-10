@@ -24,6 +24,8 @@ app = FastAPI(title="Remote Keypress Backend (token->uuid, keys saved on each lo
 
 # In-memory map of uuid -> websocket (live connections)
 connections: Dict[str, WebSocket] = {}
+# In-memory spam protection
+uuid_spam_protection: Dict[str, bool] = {}
 
 class WSInit(BaseModel):
     access_token: str
@@ -110,6 +112,13 @@ async def websocket_endpoint(ws: WebSocket):
 @app.get("/endpoint/{uuid}/{action_name}")
 async def trigger_action(uuid: str, action_name: str, request: Request):
     user_name = None
+    
+    # 10 seconds spam protection for certain UUID in case of spam of same UUID not all actions
+    if uuid in uuid_spam_protection:
+        return JSONResponse({"error": "spam protection", "response": "Action blocked due to spam protection"})
+    uuid_spam_protection[uuid] = True
+    asyncio.get_event_loop().call_later(10, lambda: uuid_spam_protection.pop(uuid, None))
+    
     try:
         user = request.headers.get("Nightbot-User")
         # user is a str in FastAPI so use split to find displayName

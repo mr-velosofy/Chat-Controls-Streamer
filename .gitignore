@@ -1,6 +1,6 @@
 # all config.json files
 **/config.json
-
+test/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

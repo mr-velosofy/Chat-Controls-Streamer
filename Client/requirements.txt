@@ -6,3 +6,4 @@ uvicorn[standard]
 motor
 pydantic
 rich
+pynput

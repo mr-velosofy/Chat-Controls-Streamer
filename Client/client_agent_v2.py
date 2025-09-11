@@ -9,18 +9,6 @@ import os
 import ctypes
 
 # ==============================
-# Mouse button constants (Windows only)
-# ==============================
-MOUSEEVENTF_XDOWN = 0x0080
-MOUSEEVENTF_XUP = 0x0100
-XBUTTON1 = 0x0001
-XBUTTON2 = 0x0002
-
-def click_xbutton(button=1):
-    ctypes.windll.user32.mouse_event(MOUSEEVENTF_XDOWN, 0, 0, button, 0)
-    ctypes.windll.user32.mouse_event(MOUSEEVENTF_XUP, 0, 0, button, 0)
-
-# ==============================
 # Rich UI (instead of colorama)
 # ==============================
 from rich.console import Console
@@ -57,7 +45,7 @@ CONFIG_PATH = "config.json"
 # Keyboard support
 # ==============================
 try:
-    import keyboard   # pip install keyboard
+    import keyboard   
 except Exception:
     keyboard = None
     log_warn("Keyboard library not available! Some actions may not work.")
@@ -99,20 +87,11 @@ def ws_on_message(ws, message):
 def perform_action(keybind: str, duration: float, action_name: str = None, user_name: str = None):
 
     label = f"{action_name + " (" + keybind.upper() + ")"}"
+    keybind = keybind.lower()
     #  if user_name then add <user_name>
     if user_name:
         label = f"{user_name} - {label}"
     try:
-        # Special case: mouse buttons
-        if keybind == "mb4":
-            click_xbutton(XBUTTON1)
-            log_action(f"{label} → Mb4 Clicked once")
-            return
-        elif keybind == "mb5":
-            click_xbutton(XBUTTON2)
-            log_action(f"{label} → Mb5 Clicked once")
-            return
-
         # Normal keyboard presses
         if duration == 0:
             if keyboard:
@@ -127,12 +106,12 @@ def perform_action(keybind: str, duration: float, action_name: str = None, user_
         if keyboard:
             while time.time() < end:
                 keyboard.press(keybind)
-                time.sleep(0.035)
+                time.sleep(0.03)
             keyboard.release(keybind)
         else:
             log_warn(f"{label} → Keyboard lib not available; simulating only")
             while time.time() < end:
-                time.sleep(0.035)
+                time.sleep(0.03)
 
         log_action(f"{label} → Held for {duration}s ")
     except Exception as e:
